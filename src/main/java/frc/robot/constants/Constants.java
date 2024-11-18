@@ -5,6 +5,11 @@
 
 package frc.robot.constants;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -15,5 +20,15 @@ package frc.robot.constants;
  */
 public final class Constants {
     public static final int XBOX_CONTROLLER_PORT = 0;
-    public static final String CANIVORE_BUS = "canivoreBus";
+
+    public static final String CANIVORE_BUS = "robotBus";
+    public static final String DIGITAL_PORT = "digitalPort";
+
+    public static CANcoderConfiguration BASE_CANCODER_CONFIGS = new CANcoderConfiguration().withMagnetSensor(
+            new MagnetSensorConfigs()
+                    .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
+                    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+    );
+
+    public static final double FIELD_LENGTH = 26;
 }

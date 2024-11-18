@@ -8,6 +8,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.di.DaggerRobotModule;
+import frc.robot.di.RobotModule;
 
 
 /**
@@ -18,10 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
     private Command autonomousCommand;
-
     private RobotContainer robotContainer;
-
-
     /**
      * This method is run when the robot is first started up and should be used for any
      * initialization code.
@@ -30,7 +29,8 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.
-        robotContainer = new RobotContainer();
+        RobotModule robotModule = DaggerRobotModule.create();
+        robotContainer = robotModule.robotContainer();
     }
 
 
@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
+        CommandScheduler.getInstance().cancelAll();
     }
 
 

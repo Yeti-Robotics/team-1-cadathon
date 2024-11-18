@@ -1,82 +1,65 @@
 package frc.robot.subsystem.elevator;
 
 
-import com.ctre.phoenix6.configs.*;
-import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.*;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants;
+import frc.robot.util.device.Encoder;
+import frc.robot.util.device.Motor;
+import frc.robot.util.device.Switch;
+import jakarta.inject.Singleton;
 
+import static frc.robot.subsystem.elevator.ElevatorConfig.*;
+
+@Singleton
 public class ElevatorSubsystem extends SubsystemBase {
-    private static final int LEFT_ELEVATOR_MOTOR_ID = 2;
-    private static final int RIGHT_ELEVATOR_MOTOR_ID = 10;
+    private final CANcoder leftCANCoder = Encoder.configure(LEFT_CANCODER_ID, Constants.CANIVORE_BUS)
+            .extend(config -> config.MagnetSensor.MagnetOffset = LEFT_CANCODER_MAGNET_OFFSET)
+            .syncConfigs()
+            .getDevice();
 
-    private final TalonFX leftElevatorMotor = new TalonFX(LEFT_ELEVATOR_MOTOR_ID, Constants.CANIVORE_BUS);
-    private final TalonFX rightElevatorMotor = new TalonFX(RIGHT_ELEVATOR_MOTOR_ID, Constants.CANIVORE_BUS);
+    private final CANcoder rightCANCoder = Encoder.configure(RIGHT_CANCODER_ID, Constants.CANIVORE_BUS)
+            .extend(config -> config.MagnetSensor.MagnetOffset = RIGHT_CANCODER_MAGNET_OFFSET)
+            .syncConfigs()
+            .getDevice();
 
-    private static final int LEFT_CANCODER_ID = 2;
-    private static final int RIGHT_CANCODER_ID = 10;
-    private static final double LEFT_CANCODER_MAGNET_OFFSET = 0.42;
-    private static final double RIGHT_CANCODER_MAGNET_OFFSET = 0.48;
+    private final DigitalInput elevatorLimitSwitch = Switch.digitalInput(ELEVATOR_BOTTOM_SWITCH_ID);
 
-    private static final Slot0Configs slot0Configs = new Slot0Configs()
-            .withKP(45)
-            .withKI(0)
-            .withKD(0)
-            .withKG(0)
-            .withKA(0.05)
-            .withGravityType(GravityTypeValue.Elevator_Static);
+    private final TalonFX leftElevatorMotor = Motor.configure(LEFT_ELEVATOR_MOTOR_ID, Constants.CANIVORE_BUS)
+            .using(elevatorTalonConfig)
+            .withCANCoder(leftCANCoder)
+            .syncConfigs()
+            .getDevice();
 
-    private static final CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
-            .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentThreshold(65)
-            .withSupplyCurrentLimit(75)
-            .withSupplyTimeThreshold(1)
-            .withStatorCurrentLimitEnable(true)
-            .withStatorCurrentLimit(75);
+    private final TalonFX rightElevatorMotor = Motor.configure(RIGHT_ELEVATOR_MOTOR_ID, Constants.CANIVORE_BUS)
+            .using(elevatorTalonConfig)
+            .withCANCoder(rightCANCoder)
+            .follow(leftElevatorMotor)
+            .syncConfigs()
+            .getDevice();
 
-    private static final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs()
-            .withMotionMagicExpo_kV(0.2)
-            .withMotionMagicExpo_kA(0.5);
+    private final MotionMagicVoltage motionMagicVoltageReq = new MotionMagicVoltage(ElevatorPosition.HOME.getTarget())
+            .withLimitReverseMotion(getLimitSwitch());
 
-    private final CANcoder leftCANcoder = new CANcoder(LEFT_CANCODER_ID, Constants.CANIVORE_BUS);
-    private final CANcoder rightCANcoder = new CANcoder(RIGHT_CANCODER_ID, Constants.CANIVORE_BUS);
 
     public ElevatorSubsystem() {
-        TalonFXConfigurator leftMotorConfigurator = leftElevatorMotor.getConfigurator();
-        TalonFXConfigurator rightMotorConfigurator = rightElevatorMotor.getConfigurator();
+        new Trigger(this::getLimitSwitch).onTrue(toPosition(ElevatorPosition.HOVER));
+    }
 
-        TalonFXConfiguration leftTalonFXConfiguration = new TalonFXConfiguration();
+    private boolean getLimitSwitch() {
+        return elevatorLimitSwitch.get();
+    }
 
-        leftTalonFXConfiguration.Feedback.FeedbackRemoteSensorID = LEFT_CANCODER_ID;
-        leftTalonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        leftTalonFXConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        leftTalonFXConfiguration.FutureProofConfigs = true;
-        leftTalonFXConfiguration.Feedback.SensorToMechanismRatio = 1;
-        leftTalonFXConfiguration.Feedback.RotorToSensorRatio = 1;
-        leftTalonFXConfiguration.CurrentLimits = currentLimitsConfigs;
-        leftTalonFXConfiguration.Slot0 = slot0Configs;
-        leftTalonFXConfiguration.MotionMagic = motionMagicConfigs;
+    private void setElevatorToPosition(ElevatorPosition position) {
+        leftElevatorMotor.setControl(motionMagicVoltageReq.withPosition(position.getTarget()));
+    }
 
-        leftMotorConfigurator.apply(leftTalonFXConfiguration);
-        rightMotorConfigurator.apply(leftTalonFXConfiguration);
-
-        rightElevatorMotor.setControl(new Follower(LEFT_ELEVATOR_MOTOR_ID, true));
-
-        MagnetSensorConfigs leftMagnetConfigs = new MagnetSensorConfigs();
-        MagnetSensorConfigs rightMagnetConfigs = new MagnetSensorConfigs();
-
-        leftMagnetConfigs.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-        leftMagnetConfigs.MagnetOffset = LEFT_CANCODER_MAGNET_OFFSET;
-        leftMagnetConfigs.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-
-        rightMagnetConfigs.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-        rightMagnetConfigs.MagnetOffset = RIGHT_CANCODER_MAGNET_OFFSET;
-        rightMagnetConfigs.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-
-        leftCANcoder.getConfigurator().apply(leftMagnetConfigs);
-        rightCANcoder.getConfigurator().apply(rightMagnetConfigs);
+    public Command toPosition(ElevatorPosition position) {
+        return runOnce(() -> setElevatorToPosition(position));
     }
 }

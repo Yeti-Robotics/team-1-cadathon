@@ -51,6 +51,7 @@ public class TunerConstants {
     private static final String kCANbusName = "canivoreBus";
     private static final int kPigeonId = 1;
 
+    public static final double kAngularRate = 1.5 * Math.PI;
 
     // These are only used for simulation
     private static final double kSteerInertia = 0.00001;
@@ -117,7 +118,6 @@ public class TunerConstants {
 
     private static final double kBackRightXPosInches = -11.125;
     private static final double kBackRightYPosInches = -11.125;
-
 
     private static final SwerveModuleConstants FrontLeft = ConstantCreator.createModuleConstants(
             kFrontLeftSteerMotorId, kFrontLeftDriveMotorId, kFrontLeftEncoderId, kFrontLeftEncoderOffset, Units.inchesToMeters(kFrontLeftXPosInches), Units.inchesToMeters(kFrontLeftYPosInches), kInvertLeftSide);
