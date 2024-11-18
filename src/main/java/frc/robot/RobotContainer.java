@@ -78,7 +78,7 @@ public class RobotContainer {
         xboxController.leftBumper().whileTrue(intakeSubsystem.deposit());
 
         xboxController.x().whileTrue(rollerSubsystem.suck());
-        xboxController.y().whileTrue(rollerSubsystem.dump());
+        xboxController.y().whileTrue(rollerSubsystem.visionAlignDump(() -> -xboxController.getLeftX(), () -> -xboxController.getLeftY()));
 
         xboxController.povUpLeft().onTrue(elevatorSubsystem.toPosition(ElevatorPosition.LOW_GOAL));
         xboxController.povUpRight().onTrue(elevatorSubsystem.toPosition(ElevatorPosition.HIGH_GOAL));
@@ -86,7 +86,7 @@ public class RobotContainer {
 
         commandSwerveDrivetrain.setDefaultCommand(
                 commandSwerveDrivetrain.runRequest( () -> new SwerveRequest.FieldCentric()
-                        .withVelocityX(-xboxController.getLeftY() * TunerConstants.kSpeedAt12VoltsMps)
+                        .withVelocityX(-xboxController.getLeftX() * TunerConstants.kSpeedAt12VoltsMps)
                         .withVelocityY(-xboxController.getLeftY() * TunerConstants.kSpeedAt12VoltsMps)
                         .withRotationalRate(-xboxController.getRightY() * TunerConstants.kSpeedAt12VoltsMps * TunerConstants.kAngularRate))
         );

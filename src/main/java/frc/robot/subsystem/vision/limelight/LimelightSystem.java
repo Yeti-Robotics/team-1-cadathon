@@ -1,11 +1,14 @@
 package frc.robot.subsystem.vision.limelight;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystem.drivetrain.CommandSwerveDrivetrain;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.Optional;
 
 import static frc.robot.subsystem.vision.limelight.LimelightConfig.LIMELIGHT_NAME;
 
@@ -25,6 +28,20 @@ public class LimelightSystem extends SubsystemBase {
         ).andThen(Commands.waitSeconds(4)).andThen(runOnce(() ->
             LimelightHelpers.setLEDMode_PipelineControl(LIMELIGHT_NAME)
         ));
+    }
+
+    public Optional<Pose2d> getTagHeading(int tag) {
+        double currentTag = LimelightHelpers.getFiducialID(LIMELIGHT_NAME);
+
+        if (currentTag == tag) {
+          LimelightHelpers.PoseEstimate estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(LIMELIGHT_NAME);
+
+          if (estimate != null) {
+              return Optional.of(estimate.pose);
+          }
+        }
+
+        return Optional.empty();
     }
 
     @Override

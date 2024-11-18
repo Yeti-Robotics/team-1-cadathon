@@ -27,12 +27,15 @@ public class IntakeSubsystem extends SubsystemBase {
     private final MotionMagicVelocityVoltage intakeMotorRequest = new MotionMagicVelocityVoltage(DEFAULT_SUCTION_SPEED);
 
     private final LimelightSystem limelightSystem;
+    private final IntakeLogging intakeLogging = new IntakeLogging();
 
     @Inject
     public IntakeSubsystem(LimelightSystem limelightSystem) {
         this.limelightSystem = limelightSystem;
 
         new Trigger(this::getIntakeBeamBreak).onTrue(limelightSystem.blink());
+        intakeLogging.initLog();
+
     }
 
     private void runIntake(boolean reversed) {
@@ -52,6 +55,11 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command deposit() {
         return runEnd(() -> runIntake(true), intakeMotor::stopMotor)
                 .until(() -> !getIntakeBeamBreak());
+    }
+
+    @Override
+    public void periodic() {
+        intakeLogging.update(intakeMotor.getVelocity().refresh().getValue());
     }
 }
 

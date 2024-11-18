@@ -9,8 +9,10 @@ class IntakeConfig {
     public static final int INTAKE_MOTOR_FRONT_ID = 5;
     public static final int INTAKE_BEAM_BREAK_ID = 2;
 
-    public static double DEFAULT_SUCTION_SPEED = 500; //in rps, how fast to move velocity motors
-    public static double DEFAULT_HOOP_SPEED = 200;
+    public static final double DEFAULT_SUCTION_SPEED = 500; //in rps, how fast to move velocity motors
+    public static final double DEFAULT_HOOP_SPEED = 200;
+
+    public static final String INTAKE_SPEED_LOG_NAME = "IntakeSpeed";
 
     private static final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
             .withNeutralMode(NeutralModeValue.Brake)

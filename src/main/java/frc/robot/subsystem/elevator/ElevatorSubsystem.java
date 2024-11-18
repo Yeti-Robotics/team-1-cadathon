@@ -46,9 +46,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final MotionMagicVoltage motionMagicVoltageReq = new MotionMagicVoltage(ElevatorPosition.HOME.getTarget())
             .withLimitReverseMotion(getLimitSwitch());
 
+    private final ElevatorLogging logger = new ElevatorLogging();
 
     public ElevatorSubsystem() {
         new Trigger(this::getLimitSwitch).onTrue(toPosition(ElevatorPosition.HOVER));
+        logger.initLog();
     }
 
     private boolean getLimitSwitch() {
@@ -61,5 +63,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command toPosition(ElevatorPosition position) {
         return runOnce(() -> setElevatorToPosition(position));
+    }
+
+    @Override
+    public void periodic() {
+        logger.update(leftElevatorMotor.getPosition().refresh().getValue());
     }
 }

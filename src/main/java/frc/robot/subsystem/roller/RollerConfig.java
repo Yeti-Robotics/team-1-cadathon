@@ -4,6 +4,8 @@ import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public class RollerConfig {
     public static int ROLLER_LOWER_MOTOR_ID = 8;
@@ -11,6 +13,11 @@ public class RollerConfig {
 
     public static double DEFAULT_SUCTION_SPEED = 600;
     public static double DEFAULT_OUTPUT_SPEED = 400;
+
+    public static final String SUCTION_SPEED_LOG_NAME = "LowRollerSpeed";
+    public static final String DEPOSIT_SPEED_LOG_NAME = "HighRollerSpeed";
+
+    public static final Pose2d DUNK_TANK = new Pose2d(2, 5, Rotation2d.fromDegrees(0));
 
     private static final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
             .withNeutralMode(NeutralModeValue.Brake)

@@ -13,6 +13,8 @@ class ElevatorConfig {
     public static final double RIGHT_CANCODER_MAGNET_OFFSET = 0.48;
     public static final int ELEVATOR_BOTTOM_SWITCH_ID = 0;
 
+    public static final String ELEVATOR_POSITION_LOG_NAME = "ElevatorPosition";
+
     private static final Slot0Configs slot0Configs = new Slot0Configs()
             .withKP(45)
             .withKI(0)

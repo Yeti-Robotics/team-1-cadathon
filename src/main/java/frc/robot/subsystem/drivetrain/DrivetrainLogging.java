@@ -5,9 +5,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.util.Logger;
 
-public class DrivetrainLogging {
-
+public class DrivetrainLogging implements Logger {
     private final Field2d field2d = new Field2d();
     private final StructPublisher<Pose2d> robotPose = NetworkTableInstance.getDefault()
             .getStructTopic("Robot Pose", Pose2d.struct).publish();
@@ -16,7 +16,7 @@ public class DrivetrainLogging {
         SmartDashboard.putData("Field", field2d);
     }
 
-    public void updatePose(Pose2d pose) {
+    public void update(Pose2d pose) {
         field2d.setRobotPose(pose);
         robotPose.set(pose);
     }

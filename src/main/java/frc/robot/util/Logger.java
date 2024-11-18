@@ -1,6 +1,5 @@
 package frc.robot.util;
 
-public interface Loggable {
-    void log();
+public interface Logger {
     void initLog();
 }

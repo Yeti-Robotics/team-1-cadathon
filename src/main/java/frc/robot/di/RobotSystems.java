@@ -33,8 +33,8 @@ public class RobotSystems {
 
     @Provides
     @Singleton
-    RollerSubsystem provideRollerSubsystem(LimelightSystem limelightSystem) {
-        return new RollerSubsystem(limelightSystem);
+    RollerSubsystem provideRollerSubsystem(LimelightSystem limelightSystem, CommandSwerveDrivetrain drivetrain) {
+        return new RollerSubsystem(limelightSystem, drivetrain);
     }
 
     @Provides
